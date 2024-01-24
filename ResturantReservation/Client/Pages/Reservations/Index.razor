@@ -1,0 +1,78 @@
+﻿    @page "/reservations/"
+@inject HttpClient _client
+@inject IJSRuntime js
+@attribute [Authorize]
+
+<h3 class="card-title">Restaurant Reservations</h3>
+
+<a href="/reservations/create" class="btn btn-secondary">
+    <span class="oi oi-plus"></span>
+    Make Reservation
+</a>
+<br />
+<br />
+
+@if (Reservations == null)
+{
+    <div class="alert alert-info">Loading Reservations...</div>
+}
+else
+{
+    <table class="table table-responsive">
+        <thead>
+            <tr>
+                <th>Restaurant</th>
+                <th>Customer Name</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reservation in Reservations)
+            {
+                <tr>
+                    <td>@reservation.Restaurant.Name - @reservation.Restaurant.Address</td>
+                    <td>@reservation.Customer.FirstName @reservation.Customer.LastName</td>
+                    <td>@reservation.DateOut.ToString("dd MMMM yyyy")</td>
+                    @*<td>@reservation.DateCreated.Date.ToString("dd MMMM yyyy")</td>*@
+                    <td>
+                        <a href="/reservations/view/@reservation.Id" class="btn btn-primary">
+                            <span class="oi oi-book"></span>
+                        </a>
+                        <a href="/reservations/edit/@reservation.Id" class="btn btn-warning">
+                            <span class="oi oi-pencil"></span>
+                        </a>
+                        <button class="btn btn-danger" @onclick="@(()=>Delete(reservation.Id))">
+                            <span class="oi oi-delete"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<br />
+
+@code {
+    private List<Reservation>? Reservations;
+
+    protected async override Task OnInitializedAsync()
+    {
+        Reservations = await _client.GetFromJsonAsync<List<Reservation>>($"{Endpoints.ReservationsEndpoint}");
+    }
+
+    async Task Delete(int reservationId)
+    {
+        if (Reservations != null)
+        {
+            var reservation = Reservations.First(q => q.Id == reservationId);
+            var confirm = await js.InvokeAsync<bool>("confirm", $"Do you want to delete at {reservation.Restaurant.Name}?");
+            if (confirm)
+            {
+                await _client.DeleteAsync($"{Endpoints.ReservationsEndpoint}/{reservationId}");
+                await OnInitializedAsync();
+            }
+        }
+    }
+}

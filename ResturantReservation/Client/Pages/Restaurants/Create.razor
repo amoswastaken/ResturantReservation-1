@@ -1,0 +1,115 @@
+﻿@page "/restaurants/create/"
+@inject HttpClient _client  
+@inject NavigationManager _navManager 
+
+<h3 class="card-title">Add New Restaurant</h3>
+
+<FormComponent ButtonText="Add Restaurant" restaurant="restaurant" OnValidSubmit="@CreateRestaurant" />
+
+@*<EditForm Model="@restaurant" OnValidSubmit="CreateRestaurant"> 
+    <DataAnnotationsValidator /> 
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label>Name of the Restaurant: </label>
+        <div>
+            <InputText @bind-Value="@restaurant.Name" class="form-control" />
+            <ValidationMessage For="@(() => restaurant.Name)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Description: </label>
+        <div>
+            <InputText @bind-Value="@restaurant.Description" class="form-control" />
+            <ValidationMessage For="@(() => restaurant.Description)" />
+        </div>
+    </div>
+
+    <div class="form_group">
+        <label>Cuisine Type: </label>
+        <div>
+            <InputSelect @bind-Value="restaurant.CuisineId" class="form-control">
+                <option value="">-- Select Cuisine --</option>
+                @if (Cuisines != null)
+                {
+                    foreach (var cuisine in Cuisines)
+                    {
+                        <option value="@cuisine.Id">@cuisine.Name</option>
+                    }
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => restaurant.CuisineId)" />
+        </div>
+    </div>
+
+    <div class="form_group">
+        <label>Diet Type: </label>
+        <div>
+            <InputSelect @bind-Value="restaurant.DietId" class="form-control">
+                <option value="">-- Select Diet --</option>
+                @if (Diets != null)
+                {
+                    foreach (var diet in Diets)
+                    {
+                        <option value="@diet.Id">@diet.Name</option>
+                    }
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => restaurant.DietId)" />
+        </div>
+    </div>
+
+    <div class="form_group">
+        <label>Location: </label>
+        <div>
+            <InputSelect @bind-Value="restaurant.LocationId" class="form-control">
+                <option value="">-- Select Location --</option>
+                @if (Locations != null)
+                {
+                    foreach (var location in Locations)
+                    {
+                        <option value="@location.Id">@location.Name</option>
+                    }
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => restaurant.DietId)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Address: </label>
+        <div>
+            <InputText @bind-Value="@restaurant.Address" class="form-control" />
+            <ValidationMessage For="@(() => restaurant.Address)" />
+        </div>
+    </div>
+
+    <br />
+
+    <button type="submit" class="btn btn-success btn-block">
+        Add Restaurant
+    </button>
+    <BackToList Target="restaurants" />
+</EditForm>*@
+
+@code {
+    Restaurant restaurant = new Restaurant();
+
+    private IList<Cuisine>? Cuisines;
+    private IList<Diet>? Diets;
+    private IList<Location>? Locations;
+
+    protected async override Task OnInitializedAsync()
+    {
+        Cuisines = await _client.GetFromJsonAsync<List<Cuisine>>($"{Endpoints.CuisinesEndpoint}");
+        Diets = await _client.GetFromJsonAsync<List<Diet>>($"{Endpoints.DietsEndpoint}");
+        Locations = await _client.GetFromJsonAsync<List<Location>>($"{Endpoints.LocationsEndpoint}");
+    }
+
+    private async Task CreateRestaurant()
+    {
+        await _client.PostAsJsonAsync(Endpoints.RestaurantsEndpoint, restaurant);
+        _navManager.NavigateTo("/restaurants/");
+    }
+}

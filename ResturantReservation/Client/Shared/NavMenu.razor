@@ -20,7 +20,7 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="authentication/profile" Match="NavLinkMatch.All">
-                        <span class="oi oi-person" aria-hidden="true"></span> User.Identity?.Name!
+                        <span class="oi oi-person" aria-hidden="true"></span> @context.User.Identity?.Name!
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
@@ -43,8 +43,38 @@
             </NotAuthorized>
         </AuthorizeView>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="SearchPage">
+            <NavLink class="nav-link" href="restaurants">
                 <span class="oi oi-magnifying-glass" aria-hidden="true"></span> Search
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="reservations">
+                <span class="oi oi-clock" aria-hidden="true"></span> Reservation
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="reviews">
+                <span class="oi oi-star" aria-hidden="true"></span> Review
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="cuisines">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Cuisine
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="diets">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Diet
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="locations">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Location
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="customers">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Customer
             </NavLink>
         </div>
         <div class="nav-item px-3">

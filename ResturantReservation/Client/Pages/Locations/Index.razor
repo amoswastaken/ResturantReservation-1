@@ -1,0 +1,74 @@
+﻿@page "/locations/"
+@inject HttpClient _client
+@inject IJSRuntime js
+@attribute [Authorize]
+
+<h3 class="card-title">Types of Location</h3>
+<br />
+
+<a href="/locations/create" class="btn btn-secondary">
+    <span class="oi oi-plus"></span>
+    Create New Locations
+</a>
+<br />
+<br />
+
+@if (Locations == null)
+{
+    <div class="alert alert-info">Loading Locations...</div>
+}
+else
+{
+    <table class="table table-responsive">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var Location in Locations)
+            {
+                <tr>
+                    <td>@Location.Name</td>
+                    <td>
+                        <a href="/Locations/view/@Location.Id" class="btn btn-primary">
+                            <span class="oi oi-book"></span>
+                        </a>
+                        <a href="/Locations/edit/@Location.Id" class="btn btn-warning">
+                            <span class="oi oi-pencil"></span>
+                        </a>
+                        <button class="btn btn-danger" @onclick="@(()=>Delete(Location.Id))">
+                            <span class="oi oi-delete"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<br />
+
+@code {
+    private List<Location>? Locations;
+
+    protected async override Task OnInitializedAsync()
+    {
+        Locations = await _client.GetFromJsonAsync<List<Location>>($"{Endpoints.LocationsEndpoint}");
+    }
+
+    async Task Delete(int locationId)
+    {
+        if (Locations != null)
+        {
+            var location = Locations.First(q => q.Id == locationId);
+            var confirm = await js.InvokeAsync<bool>("confirm", $"Do you want to delete {location.Name}?");
+            if (confirm)
+            {
+                await _client.DeleteAsync($"{Endpoints.LocationsEndpoint}/{locationId}");
+                await OnInitializedAsync();
+            }
+        }
+    }
+}

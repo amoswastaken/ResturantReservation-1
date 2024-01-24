@@ -1,0 +1,110 @@
+﻿@page "/reservations/create/"
+@inject HttpClient _client
+@inject NavigationManager _navManager
+
+<h3 class="card-title">Make Reservations</h3>
+<hr />
+<br />
+
+<FormComponent ButtonText="Make Reservation" reservation="reservation" OnValidSubmit="@CreateReservation" />
+
+@*<EditForm Model="@reservation" OnValidSubmit="CreateReservation">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form_group">
+        <label>Restaurant: </label>
+        <div>
+            <InputSelect @bind-Value="reservation.RestaurantId" class="form-control">
+                <option value="">-- Select Restaurant --</option>
+                @if (Restaurants != null)
+                {
+                    foreach (var restaurant in Restaurants)
+                    {
+                        <option value="@restaurant.Id">@restaurant.Name - @restaurant.Address</option>
+                    }
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => reservation.RestaurantId)" />
+        </div>
+    </div>
+
+    <div class="form_group">
+        <label>Customers: </label>
+        <div>
+            <InputSelect @bind-Value="reservation.CustomerId" class="form-control">
+                <option value="">-- Select Customer --</option>
+                @if (Customers != null)
+                {
+                    foreach (var customer in Customers)
+                    {
+                        <option value="@customer.Id">@customer.FirstName - @customer.Address</option>
+                    }
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => reservation.CustomerId)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Guest Count: </label>
+        <div>
+            <InputNumber @bind-Value="@reservation.GuestCount" class="form-control" />
+            <ValidationMessage For="@(() => reservation.GuestCount)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+         <label>Date: </label>
+         <div>
+             <InputDate @bind-Value="@reservation.DateOut" class="form-control" />
+             <ValidationMessage For="@(() => reservation.DateOut)" />
+         </div>
+    </div>
+
+    <div class="form_group">
+        <label>Time Slot: </label>
+        <div>
+            <InputSelect @bind-Value="reservation.TimeId" class="form-control">
+                <option value="">-- Select Time Slot--</option>
+                @if (Times != null)
+                {
+                    foreach (var time in Times)
+                    {
+                        <option value="@time.Id">@time.Timeslot</option>
+                    }
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => reservation.TimeId)" />
+        </div>
+    </div>
+
+    <br />
+
+    <button type="submit" class="btn btn-success btn-block">
+        Make Reservation
+    </button>
+    <BackToList Target="reservations" />
+</EditForm>*@
+
+
+@code {
+    Reservation reservation = new Reservation();
+
+    private IList<Restaurant>?  Restaurants;
+    private IList<Customer>? Customers;
+    private IList<Time>? Times;
+
+    protected async override Task OnInitializedAsync()
+    {
+        Restaurants = await _client.GetFromJsonAsync<List<Restaurant>>($"{Endpoints.RestaurantsEndpoint}");
+        Customers = await _client.GetFromJsonAsync<List<Customer>>($"{Endpoints.CustomersEndpoint}");
+        Times = await _client.GetFromJsonAsync<List<Time>>($"{Endpoints.TimesEndpoint}");
+    }
+
+    private async Task CreateReservation()
+    {
+        await _client.PostAsJsonAsync(Endpoints.ReservationsEndpoint, reservation);
+        _navManager.NavigateTo("/reservations/");
+    }
+}
